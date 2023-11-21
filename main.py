@@ -20,12 +20,11 @@ if __name__ == "__main__":
     if args.semantic_search:
         semantic_search = query_embeddings(args.input)
         print(f'Semantic search: {semantic_search}')
-        print('='*50)
     else:
         qa_chain = setup_qa_chain()
         response = qa_chain({'query': args.input})
         print(f'\nAnswer: {response["result"]}')
-        print('=' * 50)
+    print('='*50)
     end = timeit.default_timer()
 
     print(f"Time to retrieve answer: {end - start}")

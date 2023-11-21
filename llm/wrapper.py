@@ -18,10 +18,9 @@ def set_qa_prompt():
     Prompt template for QA retrieval for each vectorstore
     """
 
-    prompt = PromptTemplate(template=qa_template,
-                            input_variables=['context', 'question'])
-
-    return prompt
+    return PromptTemplate(
+        template=qa_template, input_variables=['context', 'question']
+    )
 
 
 def build_retrieval_qa_chain(llm, prompt):
@@ -30,20 +29,19 @@ def build_retrieval_qa_chain(llm, prompt):
     vectordb = FAISS.load_local(cfg.DB_FAISS_PATH, embeddings)
     retriever = vectordb.as_retriever(search_kwargs={'k': cfg.VECTOR_COUNT})
 
-    qa_chain = RetrievalQA.from_chain_type(llm=llm,
-                                           chain_type='stuff',
-                                           retriever=retriever,
-                                           return_source_documents=cfg.RETURN_SOURCE_DOCUMENTS,
-                                           chain_type_kwargs={'prompt': prompt})
-    return qa_chain
+    return RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type='stuff',
+        retriever=retriever,
+        return_source_documents=cfg.RETURN_SOURCE_DOCUMENTS,
+        chain_type_kwargs={'prompt': prompt},
+    )
 
 
 def setup_qa_chain():
     llm = setup_llm()
     qa_prompt = set_qa_prompt()
-    qa_chain = build_retrieval_qa_chain(llm, qa_prompt)
-
-    return qa_chain
+    return build_retrieval_qa_chain(llm, qa_prompt)
 
 
 def query_embeddings(query):
@@ -51,6 +49,4 @@ def query_embeddings(query):
                                        model_kwargs={'device': 'cpu'})
     vectordb = FAISS.load_local(cfg.DB_FAISS_PATH, embeddings)
     retriever = vectordb.as_retriever(search_kwargs={'k': cfg.VECTOR_COUNT})
-    semantic_search = retriever.get_relevant_documents(query)
-
-    return semantic_search
+    return retriever.get_relevant_documents(query)
